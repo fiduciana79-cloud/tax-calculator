@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAE Tax Escape Calculator - Anna Homenko</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #C9A96E 0%, #B8860B 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #C9A96E;
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #C9A96E 0%, #B8860B 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin: 30px 0;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .results {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .loss {
+            color: #dc3545;
+        }
+        
+        .savings {
+            color: #28a745;
+        }
+        
+        .shocking {
+            background: #dc3545;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .cta {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .cta h3 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .cta p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .cta-btn {
+            background: white;
+            color: #28a745;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+        
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>UAE Tax Escape Calculator</h1>
+            <p>Discover exactly how much you're losing to unnecessary taxes</p>
+        </div>
+        
+        <div class="content">
+            <div class="row">
+                <div class="form-group">
+                    <label for="revenue">Annual Business Revenue ($)</label>
+                    <input type="number" id="revenue" placeholder="e.g., 1,500,000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="country">Current Country</label>
+                    <select id="country">
+                        <option value="">Select your country</option>
+                        <option value="45">United Kingdom (45%)</option>
+                        <option value="43">Canada (43%)</option>
+                        <option value="37">United States (37%)</option>
+                        <option value="42">Germany (42%)</option>
+                        <option value="45">France (45%)</option>
+                        <option value="47">Australia (47%)</option>
+                        <option value="40">Spain (40%)</option>
+                        <option value="38">Netherlands (38%)</option>
+                        <option value="35">Other (35%)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="personal-income">Personal Income from Business ($)</label>
+                    <input type="number" id="personal-income" placeholder="e.g., 500,000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="years">Years in business</label>
+                    <select id="years">
+                        <option value="1">1 year</option>
+                        <option value="2">2 years</option>
+                        <option value="3">3 years</option>
+                        <option value="5">5 years</option>
+                        <option value="10">10+ years</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="calculate-btn" onclick="calculateSavings()">
+                Calculate My Tax Escape Savings
+            </button>
+            
+            <div id="results" class="results">
+                <h3 style="margin-bottom: 20px; color: #333; text-align: center;">Your Tax Reality Check</h3>
+                
+                <div class="result-item">
+                    <span class="result-label">Current Annual Tax (Corporate + Personal)</span>
+                    <span class="result-value loss" id="current-tax">$0</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">UAE Tax (0% on first $100K + 9% above + 0% Personal)</span>
+                    <span class="result-value" id="uae-tax">$0</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Annual Savings</span>
+                    <span class="result-value savings" id="annual-savings">$0</span>
+                </div>
+                
+                <div class="shocking" id="shocking-fact">
+                    You're giving away $0 every single day to unnecessary taxes!
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">5-Year UAE Savings</span>
+                    <span class="result-value savings" id="five-year-savings">$0</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">10-Year UAE Savings</span>
+                    <span class="result-value savings" id="ten-year-savings">$0</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Money Lost While "Thinking About It"</span>
+                    <span class="result-value loss" id="opportunity-cost">$0 per month</span>
+                </div>
+                
+                <h4 style="margin: 30px 0 15px 0; color: #333;">Break-Even Analysis</h4>
+                
+                <div class="result-item">
+                    <span class="result-label">Estimated UAE Setup Costs</span>
+                    <span class="result-value" id="setup-costs">$0</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Break-Even Timeline</span>
+                    <span class="result-value savings" id="breakeven-time">0 months</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">ROI After Year 1</span>
+                    <span class="result-value savings" id="roi-year1">0%</span>
+                </div>
+                
+                <div class="cta">
+                    <h3>Stop Funding Government Waste</h3>
+                    <p>While you pay 40%+ for broken roads and failing systems, UAE builds world-class infrastructure with 9% tax.</p>
+                    <p><strong>Ready to keep your hard-earned money?</strong></p>
+                    <button class="cta-btn" onclick="bookConsultation()">Book Free Consultation</button>
+                </div>
+                
+                <div class="disclaimer">
+                    <strong>Disclaimer:</strong> This calculator provides estimates based on general tax rates. Actual savings depend on individual circumstances, business structure, and current tax planning. Consult with Anna Homenko for personalized UAE relocation strategy.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateSavings() {
+            const revenue = parseFloat(document.getElementById('revenue').value);
+            const countryTaxRate = parseFloat(document.getElementById('country').value);
+            const personalIncome = parseFloat(document.getElementById('personal-income').value);
+            const years = parseInt(document.getElementById('years').value);
+            
+            if (!revenue || !countryTaxRate || !personalIncome) {
+                alert('Please fill in all fields to calculate your savings.');
+                return;
+            }
+            
+            // Current tax calculation (simplified)
+            const corporateTax = revenue * (countryTaxRate / 100);
+            const personalTax = personalIncome * (countryTaxRate / 100);
+            const currentTotalTax = corporateTax + personalTax;
+            
+            // UAE tax calculation (9% on profits above $100,000)
+            const uaeCorporateTax = revenue > 100000 ? (revenue - 100000) * 0.09 : 0;
+            const uaePersonalTax = 0; // 0%
+            const uaeTotalTax = uaeCorporateTax + uaePersonalTax;
+            
+            // Savings
+            const annualSavings = currentTotalTax - uaeTotalTax;
+            const dailySavings = annualSavings / 365;
+            const monthlySavings = annualSavings / 12;
+            const fiveYearSavings = annualSavings * 5;
+            const tenYearSavings = annualSavings * 10;
+            
+            // Break-even analysis
+            let setupCosts;
+            if (revenue < 500000) {
+                setupCosts = 25000; // Basic setup
+            } else if (revenue < 1000000) {
+                setupCosts = 35000; // Standard setup
+            } else if (revenue < 2000000) {
+                setupCosts = 50000; // Premium setup
+            } else {
+                setupCosts = 75000; // Elite setup with complex structuring
+            }
+            
+            const breakEvenMonths = Math.ceil(setupCosts / monthlySavings);
+            const roiYear1 = ((annualSavings - setupCosts) / setupCosts) * 100;
+            
+            // Update results
+            document.getElementById('current-tax').textContent = formatCurrency(currentTotalTax);
+            document.getElementById('uae-tax').textContent = formatCurrency(uaeTotalTax);
+            document.getElementById('annual-savings').textContent = formatCurrency(annualSavings);
+            document.getElementById('five-year-savings').textContent = formatCurrency(fiveYearSavings);
+            document.getElementById('ten-year-savings').textContent = formatCurrency(tenYearSavings);
+            document.getElementById('opportunity-cost').textContent = formatCurrency(monthlySavings) + ' per month';
+            document.getElementById('setup-costs').textContent = formatCurrency(setupCosts);
+            document.getElementById('breakeven-time').textContent = breakEvenMonths + ' months';
+            document.getElementById('roi-year1').textContent = Math.round(roiYear1) + '%';
+            document.getElementById('shocking-fact').textContent = 
+                `You're giving away ${formatCurrency(dailySavings)} every single day to unnecessary taxes!`;
+            
+            // Show results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+        
+        function bookConsultation() {
+            window.open('https://www.fidu-uae.com/vsl?fbclid=PARlRTSAMqI79leHRuA2FlbQIxMQABp6L8FrO0BQaeMPJHUiXhNfpIps7chTzoK-6WF7clE6FXYWMBjscmqqGpWDvz_aem_hUV3e3t1r2b6A-dYgFM6QA', '_blank');
+        }
+    </script>
+</body>
+</html>
